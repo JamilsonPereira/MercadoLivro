@@ -1,9 +1,15 @@
 package com.mercadolivro.model
 
-import javax.print.attribute.IntegerSyntax
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
 
+@Entity(name = "customer")
 data class CustomerModel(
-    var id: String?=null,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Int?=null,
     var nome: String,
     var email: String
 )

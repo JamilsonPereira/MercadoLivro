@@ -2,11 +2,14 @@ package com.mercadolivro.service
 
 import com.mercadolivro.controller.request.PutCustomerRequest
 import com.mercadolivro.model.CustomerModel
+import com.mercadolivro.repository.CustomerRepository
 import org.springframework.stereotype.Service
 
 
 @Service
-class CustomerService {
+class CustomerService(
+    val customerRepository : CustomerRepository
+) {
 
     val customers = mutableListOf<CustomerModel>()
 
@@ -21,20 +24,10 @@ class CustomerService {
     }
 
     fun create(customer: CustomerModel) {
-        val id = if (customers.isEmpty()) {
-            1
-        } else {
-            //operacao que chama o ultimo da lista e adiciona mais 1
-            customers.last().id!!.toInt() + 1
-        }.toString()
-
-        customer.id = id
-
-        customers.add(customer)
-
+        customerRepository.save(customer)
     }
 
-    fun getCustomer(id: String): CustomerModel {
+    fun getCustomer(id: Int): CustomerModel {
         //customer busca filtro, que por sua vez compara se o id que esta sendo passado é igual ao id
         //que esta na aplicação, e o coloca em primeiro lugar
         return customers.filter { it.id == id }.first()
@@ -43,10 +36,11 @@ class CustomerService {
         customers.filter { it.id == customer.id }.first().let {
             // o it está acessando o valor da variavel nome
             it.nome = customer.nome
+
             it.email = customer.email
         }
     }
-    fun delete(id: String) {
+    fun delete(id: Int) {
         //operação que remove se o id passado for igual ao que esta no codigo
         customers.removeIf { it.id == id }
     }
