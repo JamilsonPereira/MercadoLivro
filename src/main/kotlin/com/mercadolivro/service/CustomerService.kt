@@ -1,6 +1,5 @@
 package com.mercadolivro.service
 
-import com.mercadolivro.controller.request.PutCustomerRequest
 import com.mercadolivro.model.CustomerModel
 import com.mercadolivro.repository.CustomerRepository
 import org.springframework.stereotype.Service
@@ -16,32 +15,29 @@ class CustomerService(
     fun getall(name: String?): List<CustomerModel> {
         //se nome não for nullo então faça o filtro
         name?.let {
-            //retornto com filtro      acessando nome que contem letras conforme minha pesquisa
-            //                                             ignoreCase para ignorar letras M e m.
-            return customers.filter { it.nome.contains(name, ignoreCase = true) }
-        }
-        return customers
+
+            return customerRepository.findByNameContaining(it) }
+
+        return customerRepository.findAll().toList()
     }
 
     fun create(customer: CustomerModel) {
         customerRepository.save(customer)
     }
 
-    fun getCustomer(id: Int): CustomerModel {
-        //customer busca filtro, que por sua vez compara se o id que esta sendo passado é igual ao id
-        //que esta na aplicação, e o coloca em primeiro lugar
-        return customers.filter { it.id == id }.first()
+    fun getById(id: Int): CustomerModel {
+
+        //busca por id e adicionado o orElseThrow, que por está recebendo um Optional é colocado essa
+        // função pro codigo funcionar
+        return customerRepository.findById(id).orElseThrow()
     }
     fun update(customer: CustomerModel) {
-        customers.filter { it.id == customer.id }.first().let {
-            // o it está acessando o valor da variavel nome
-            it.nome = customer.nome
-
-            it.email = customer.email
-        }
+      if(!customerRepository.existsById(customer.id!!)){
+          throw Exception("Id não existe")
+      }
+       customerRepository.save(customer)
     }
     fun delete(id: Int) {
-        //operação que remove se o id passado for igual ao que esta no codigo
-        customers.removeIf { it.id == id }
+        customerRepository.deleteById(id)
     }
 }
